@@ -9,7 +9,10 @@ HINSTANCE hInst;                                // current instance
 WCHAR szTitle[MAX_LOADSTRING];                  // The title bar text
 WCHAR szWindowClass[MAX_LOADSTRING];            // the main window class name
 
-												// Forward declarations of functions included in this code module:
+
+MainContainer dataContainer = MainContainer(150, 200, 5);
+
+// Forward declarations of functions included in this code module:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
@@ -65,7 +68,7 @@ HRESULT Rectangles::Initialize()
 		wcex.hbrBackground = NULL;
 		wcex.lpszMenuName = NULL;
 		wcex.hCursor = LoadCursor(NULL, IDI_APPLICATION);
-		wcex.lpszClassName = L"D2DDemoApp";
+		wcex.lpszClassName = L"Rectangles";
 
 		RegisterClassEx(&wcex);
 
@@ -81,13 +84,13 @@ HRESULT Rectangles::Initialize()
 
 		// Create the window.
 		m_hwnd = CreateWindow(
-			L"D2DDemoApp",
-			L"Direct2D Demo App",
+			L"Rectangles",
+			L"Rectangles Algorithm",
 			WS_OVERLAPPEDWINDOW,
 			CW_USEDEFAULT,
 			CW_USEDEFAULT,
-			static_cast<UINT>(ceil(640.f * dpiX / 96.f)),
-			static_cast<UINT>(ceil(480.f * dpiY / 96.f)),
+			static_cast<UINT>(ceil(1028.f * dpiX / 96.f)),
+			static_cast<UINT>(ceil(800.f * dpiY / 96.f)),
 			NULL,
 			NULL,
 			HINST_THISCOMPONENT,
@@ -247,6 +250,8 @@ LRESULT CALLBACK Rectangles::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPA
 			PtrToUlong(pDemoApp)
 		);
 
+		
+
 		result = 1;
 	}
 	else
@@ -256,9 +261,7 @@ LRESULT CALLBACK Rectangles::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPA
 				hwnd,
 				GWLP_USERDATA
 			)));
-
-		MainContainer test = MainContainer(10, 10, 20);
-
+		
 		bool wasHandled = false;
 
 		if (pDemoApp)
@@ -327,6 +330,8 @@ HRESULT Rectangles::OnRender()
 
 		D2D1_SIZE_F rtSize = m_pRenderTarget->GetSize();
 
+		float basicMargins = 10;
+
 		int width = static_cast<int>(rtSize.width);
 		int height = static_cast<int>(rtSize.height);
 
@@ -350,27 +355,38 @@ HRESULT Rectangles::OnRender()
 			);
 		}
 
-		// Draw two rectangles.
-		D2D1_RECT_F rectangle1 = D2D1::RectF(
-			rtSize.width / 2 - 50.0f,
-			rtSize.height / 2 - 50.0f,
-			rtSize.width / 2 + 50.0f,
-			rtSize.height / 2 + 50.0f
-		);
 
-		D2D1_RECT_F rectangle2 = D2D1::RectF(
-			rtSize.width / 2 - 100.0f,
-			rtSize.height / 2 - 100.0f,
-			rtSize.width / 2 + 100.0f,
-			rtSize.height / 2 + 100.0f
+		float totalRectangleMargin = basicMargins;
+
+		float highestRecntangleHeigh = 0;
+		// Draw random rectangles
+		for(int i=0; i<dataContainer.generatedRectangles.size(); i++)
+		{
+			D2D1_RECT_F rectangle = D2D1::RectF(
+				totalRectangleMargin,
+				basicMargins,
+				totalRectangleMargin + dataContainer.generatedRectangles[i]._width,
+				basicMargins + dataContainer.generatedRectangles[i]._height
+			);
+
+			m_pRenderTarget->DrawRectangle(&rectangle, m_pCornflowerBlueBrush);
+
+			totalRectangleMargin += basicMargins + dataContainer.generatedRectangles[i]._width;
+			if (highestRecntangleHeigh < dataContainer.generatedRectangles[i]._height)
+				highestRecntangleHeigh = dataContainer.generatedRectangles[i]._height;
+		}
+
+		// Draw main rectangle.
+		D2D1_RECT_F rectangle1 = D2D1::RectF(
+			basicMargins,
+			basicMargins * 2 + highestRecntangleHeigh,
+			basicMargins + dataContainer.mainRectangle._width,
+			basicMargins * 2 + highestRecntangleHeigh + dataContainer.mainRectangle._height
 		);
 
 		// Draw a filled rectangle.
 		m_pRenderTarget->FillRectangle(&rectangle1, m_pLightSlateGrayBrush);
-
-		// Draw the outline of a rectangle.
-		m_pRenderTarget->DrawRectangle(&rectangle2, m_pCornflowerBlueBrush);
-
+		
 		hr = m_pRenderTarget->EndDraw();
 	}
 
