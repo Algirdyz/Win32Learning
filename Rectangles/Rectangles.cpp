@@ -1,8 +1,26 @@
 #include "stdafx.h"
 #include "Rectangles.h"
 #include "MainContainer.h"
+#include <fstream>
+#include <string>
+#include "Utils.h"
+
+#pragma comment(linker,"\"/manifestdependency:type='win32' \
+name='Microsoft.Windows.Common-Controls' version='6.0.0.0' \
+processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
+
 
 #define MAX_LOADSTRING 100
+#define IDC_GENERATE_BUTTON 101
+#define IDC_WIDTH_EDIT 102
+#define IDC_HEIGHT_EDIT 103
+#define IDC_NUMBER_EDIT 103
+
+HWND m_hwndHeight;
+HWND m_hwndWidth;
+HWND m_hwndGenerate;
+HWND hWndButton;
+
 
 // Global Variables:
 HINSTANCE hInst;                                // current instance
@@ -10,7 +28,7 @@ WCHAR szTitle[MAX_LOADSTRING];                  // The title bar text
 WCHAR szWindowClass[MAX_LOADSTRING];            // the main window class name
 
 
-MainContainer dataContainer = MainContainer(150, 200, 5);
+MainContainer dataContainer = MainContainer(0, 0, 0);
 
 // Forward declarations of functions included in this code module:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
@@ -72,6 +90,19 @@ HRESULT Rectangles::Initialize()
 
 		RegisterClassEx(&wcex);
 
+		WNDCLASSEX wcex2 = { sizeof(WNDCLASSEX) };
+		wcex2.style = CS_HREDRAW | CS_VREDRAW;
+		wcex2.lpfnWndProc = Rectangles::WndProc;
+		wcex2.cbClsExtra = 0;
+		wcex2.cbWndExtra = sizeof(LONG_PTR);
+		wcex2.hInstance = HINST_THISCOMPONENT;
+		wcex2.hbrBackground = NULL;
+		wcex2.lpszMenuName = NULL;
+		wcex2.hCursor = LoadCursor(NULL, IDI_APPLICATION);
+		wcex2.lpszClassName = L"Graphics";
+
+		RegisterClassEx(&wcex2);
+
 
 		// Because the CreateWindow function takes its size in pixels,
 		// obtain the system DPI and use it to scale the window size.
@@ -96,11 +127,67 @@ HRESULT Rectangles::Initialize()
 			HINST_THISCOMPONENT,
 			this
 		);
+
+		NONCLIENTMETRICS ncm;
+		ncm.cbSize = sizeof(NONCLIENTMETRICS);
+		::SystemParametersInfo(SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), &ncm, 0);
+		HFONT hFont = ::CreateFontIndirect(&ncm.lfMessageFont);
+		::SendMessage(m_hwnd, WM_SETFONT, (WPARAM)hFont, MAKELPARAM(TRUE, 0));
+
+
+		//Create graphics window
+		m_hwndDirect2d = CreateWindow(
+			L"Graphics",
+			L"Graphics screen",
+			WS_CHILD | WS_VISIBLE,
+			0,
+			100,
+			static_cast<UINT>(ceil(1028.f * dpiX / 96.f)),
+			static_cast<UINT>(ceil(700.f * dpiY / 96.f)),
+			m_hwnd,
+			NULL,
+			HINST_THISCOMPONENT,
+			this
+		);
+		
+		m_hwndHeight = CreateWindowEx(WS_EX_STATICEDGE, TEXT("Edit"), TEXT(""),
+			WS_CHILD | WS_VISIBLE | WS_BORDER, 10, 10, 140,
+			20, m_hwnd, NULL, NULL, NULL);
+
+		m_hwndWidth = CreateWindowEx(WS_EX_STATICEDGE, TEXT("Edit"), TEXT(""),
+			WS_CHILD | WS_VISIBLE | WS_BORDER, 160, 10, 140,
+			20, m_hwnd, NULL, NULL, NULL);
+
+		m_hwndGenerate = CreateWindowEx(WS_EX_STATICEDGE, TEXT("Edit"), TEXT(""),
+			WS_CHILD | WS_VISIBLE | WS_BORDER, 310, 10, 140,
+			20, m_hwnd, NULL, NULL, NULL);
+
+		hWndButton = CreateWindowEx(NULL,
+			L"BUTTON",
+			L"OK",
+			WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,
+			460,
+			10,
+			100,
+			20,
+			m_hwnd,
+			(HMENU)IDC_GENERATE_BUTTON,
+			GetModuleHandle(NULL),
+			NULL);
+
+
 		hr = m_hwnd ? S_OK : E_FAIL;
 		if (SUCCEEDED(hr))
 		{
 			ShowWindow(m_hwnd, SW_SHOWNORMAL);
 			UpdateWindow(m_hwnd);
+		}
+
+		hr = m_hwndDirect2d ? S_OK : E_FAIL;
+		if (SUCCEEDED(hr))
+		{
+			ShowWindow(m_hwndDirect2d, SW_SHOWNORMAL);
+			UpdateWindow(m_hwndDirect2d);
 		}
 	}
 
@@ -154,7 +241,7 @@ HRESULT Rectangles::CreateDeviceResources()
 	if (!m_pRenderTarget)
 	{
 		RECT rc;
-		GetClientRect(m_hwnd, &rc);
+		GetClientRect(m_hwndDirect2d, &rc);
 
 		D2D1_SIZE_U size = D2D1::SizeU(
 			rc.right - rc.left,
@@ -164,7 +251,7 @@ HRESULT Rectangles::CreateDeviceResources()
 		// Create a Direct2D render target.
 		hr = m_pDirect2dFactory->CreateHwndRenderTarget(
 			D2D1::RenderTargetProperties(),
-			D2D1::HwndRenderTargetProperties(m_hwnd, size),
+			D2D1::HwndRenderTargetProperties(m_hwndDirect2d, size),
 			&m_pRenderTarget
 		);
 
@@ -198,34 +285,6 @@ void Rectangles::DiscardDeviceResources()
 }
 
 //
-//   FUNCTION: InitInstance(HINSTANCE, int)
-//
-//   PURPOSE: Saves instance handle and creates main window
-//
-//   COMMENTS:
-//
-//        In this function, we save the instance handle in a global variable and
-//        create and display the main program window.
-//
-BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
-{
-	hInst = hInstance; // Store instance handle in our global variable
-
-	HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-		CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
-
-	if (!hWnd)
-	{
-		return FALSE;
-	}
-
-	ShowWindow(hWnd, nCmdShow);
-	UpdateWindow(hWnd);
-
-	return TRUE;
-}
-
-//
 //  FUNCTION: WndProc(HWND, UINT, WPARAM, LPARAM)
 //
 //  PURPOSE:  Processes messages for the main window.
@@ -253,6 +312,46 @@ LRESULT CALLBACK Rectangles::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPA
 		
 
 		result = 1;
+	}
+	else if(message == WM_COMMAND)
+	{
+		switch (LOWORD(wParam))
+		{
+			case IDC_GENERATE_BUTTON:
+			{
+				char buffer[256];
+				std::vector<char> height(256);
+				GetWindowTextA(m_hwndHeight, &height[0], height.size());
+
+				std::vector<char> width(256);
+				GetWindowTextA(m_hwndWidth, &width[0], width.size());
+
+				std::vector<char> numberOfRectangles(256);
+				GetWindowTextA(m_hwndGenerate, &numberOfRectangles[0], numberOfRectangles.size());
+
+				std::string heightS = std::string(height.begin(), height.end());
+				std::string widthS = std::string(width.begin(), width.end());
+				std::string numberToGenerateS = std::string(numberOfRectangles.begin(), numberOfRectangles.end());
+
+				auto a = Utils::is_number(heightS);
+				if (!(Utils::is_number(heightS) && Utils::is_number(widthS) && Utils::is_number(numberToGenerateS))) {
+					break;
+				}
+
+				float heightF = stof(heightS);
+				float widthF = stof(widthS);
+				float numberToGenerateF = stof(numberToGenerateS);
+
+				dataContainer = MainContainer(heightF, widthF, numberToGenerateF);
+				Rectangles *pDemoApp = reinterpret_cast<Rectangles *>(static_cast<LONG_PTR>(
+					::GetWindowLongPtrW(
+						hwnd,
+						GWLP_USERDATA
+					)));
+				pDemoApp->OnRender();
+			}
+			break;
+		}
 	}
 	else
 	{
@@ -330,7 +429,7 @@ HRESULT Rectangles::OnRender()
 
 		D2D1_SIZE_F rtSize = m_pRenderTarget->GetSize();
 
-		float basicMargins = 10;
+		
 
 		int width = static_cast<int>(rtSize.width);
 		int height = static_cast<int>(rtSize.height);
@@ -355,37 +454,7 @@ HRESULT Rectangles::OnRender()
 			);
 		}
 
-
-		float totalRectangleMargin = basicMargins;
-
-		float highestRecntangleHeigh = 0;
-		// Draw random rectangles
-		for(int i=0; i<dataContainer.generatedRectangles.size(); i++)
-		{
-			D2D1_RECT_F rectangle = D2D1::RectF(
-				totalRectangleMargin,
-				basicMargins,
-				totalRectangleMargin + dataContainer.generatedRectangles[i]._width,
-				basicMargins + dataContainer.generatedRectangles[i]._height
-			);
-
-			m_pRenderTarget->DrawRectangle(&rectangle, m_pCornflowerBlueBrush);
-
-			totalRectangleMargin += basicMargins + dataContainer.generatedRectangles[i]._width;
-			if (highestRecntangleHeigh < dataContainer.generatedRectangles[i]._height)
-				highestRecntangleHeigh = dataContainer.generatedRectangles[i]._height;
-		}
-
-		// Draw main rectangle.
-		D2D1_RECT_F rectangle1 = D2D1::RectF(
-			basicMargins,
-			basicMargins * 2 + highestRecntangleHeigh,
-			basicMargins + dataContainer.mainRectangle._width,
-			basicMargins * 2 + highestRecntangleHeigh + dataContainer.mainRectangle._height
-		);
-
-		// Draw a filled rectangle.
-		m_pRenderTarget->FillRectangle(&rectangle1, m_pLightSlateGrayBrush);
+		dataContainer.DrawRectangles(m_pRenderTarget, m_pLightSlateGrayBrush);
 		
 		hr = m_pRenderTarget->EndDraw();
 	}

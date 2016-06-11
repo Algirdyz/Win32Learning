@@ -57,7 +57,7 @@ public:
 	// Process and dispatch messages
 	void RunMessageLoop();
 
-	
+
 
 private:
 	// Initialize device-independent resources.
@@ -87,6 +87,7 @@ private:
 	);
 
 	HWND m_hwnd;
+	HWND m_hwndDirect2d;
 	ID2D1Factory* m_pDirect2dFactory;
 	ID2D1HwndRenderTarget* m_pRenderTarget;
 	ID2D1SolidColorBrush* m_pLightSlateGrayBrush;
