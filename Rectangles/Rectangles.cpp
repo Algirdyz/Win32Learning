@@ -117,7 +117,7 @@ HRESULT Rectangles::Initialize()
 		m_hwnd = CreateWindow(
 			L"Rectangles",
 			L"Rectangles Algorithm",
-			WS_OVERLAPPEDWINDOW,
+			WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX,
 			CW_USEDEFAULT,
 			CW_USEDEFAULT,
 			static_cast<UINT>(ceil(1028.f * dpiX / 96.f)),
@@ -319,7 +319,6 @@ LRESULT CALLBACK Rectangles::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPA
 		{
 			case IDC_GENERATE_BUTTON:
 			{
-				char buffer[256];
 				std::vector<char> height(256);
 				GetWindowTextA(m_hwndHeight, &height[0], height.size());
 
@@ -454,7 +453,9 @@ HRESULT Rectangles::OnRender()
 			);
 		}
 
-		dataContainer.DrawRectangles(m_pRenderTarget, m_pLightSlateGrayBrush);
+		float topMargin = dataContainer.DrawRectangles(m_pRenderTarget, m_pLightSlateGrayBrush);
+
+		dataContainer.DrawSolvedRectangles(m_pRenderTarget, m_pLightSlateGrayBrush, topMargin, 10);
 		
 		hr = m_pRenderTarget->EndDraw();
 	}

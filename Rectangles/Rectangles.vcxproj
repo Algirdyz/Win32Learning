@@ -145,8 +145,10 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Edge.h" />
+    <ClInclude Include="EdgeCombo.h" />
     <ClInclude Include="MainContainer.h" />
-    <ClInclude Include="Rectangle.h" />
+    <ClInclude Include="Rect.h" />
     <ClInclude Include="Rectangles.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
@@ -154,8 +156,9 @@
     <ClInclude Include="Utils.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="EdgeCombo.cpp" />
     <ClCompile Include="MainContainer.cpp" />
-    <ClCompile Include="Rectangle.cpp" />
+    <ClCompile Include="Rect.cpp" />
     <ClCompile Include="Rectangles.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
