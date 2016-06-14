@@ -41,7 +41,17 @@ void TheGrid::SplitRow(int y, float heightFromTop)
 
 void TheGrid::SplitColumn(int x, float widthFromLeft)
 {
-	// TODO implement?
+	// Calculate width of the new column
+	float newColumnWidth = sections[0][x].sizeX - widthFromLeft;
+
+	for (std::vector<ContainerSection> row : sections)
+	{
+		// Change the width of existing row element
+		row[x].sizeX = widthFromLeft;
+
+		// Add a new row element
+		row.insert(row.begin() + x + 1, ContainerSection(newColumnWidth, sections[0][x].sizeY));
+	}
 }
 
 bool TheGrid::CheckGridSize(int x, int y)
