@@ -13,3 +13,8 @@ Rect::Rect(float height, float width, int guid)
 Rect::~Rect()
 {
 }
+
+float Rect::Area()
+{
+	return _height * _width;
+}

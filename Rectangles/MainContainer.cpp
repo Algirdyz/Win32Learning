@@ -5,6 +5,7 @@
 #include <ctime>
 #include <d2d1.h>
 #include "EdgeCombo.h"
+#include <algorithm>
 
 float RandomFloat(float a, float b) {
 	float random = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
@@ -13,16 +14,20 @@ float RandomFloat(float a, float b) {
 	return a + r;
 }
 
-MainContainer::MainContainer(int mainHeight, int mainWidth, int amountToGenerate) 
-	:mainRectangle(mainHeight, mainWidth, 0)
+MainContainer::MainContainer(int mainHeight, int mainWidth, int amountToGenerate)
+	: grid(mainHeight, mainWidth)
 {
+	// Init main rectangle
+	containerHeight = mainHeight;
+	containerWidth = mainWidth;
+	
+	// Generate random rectangles and store in vector
 	srand(time(nullptr));
 	generatedRectangles.reserve(amountToGenerate);
 	for (int i = 0; i < amountToGenerate; i++) {
 		generatedRectangles.push_back(GenerateRandomRectangle(i + 1));
 	}
 
-	SolveRectangles();
 }
 
 
@@ -32,26 +37,18 @@ MainContainer::~MainContainer()
 
 Rect MainContainer::GenerateRandomRectangle(int guid)
 {
-	float height = RandomFloat(5, mainRectangle._height / 2);
-	float width = RandomFloat(5, mainRectangle._width / 2);
+	float h = RandomFloat(5, containerHeight / 2);
+	float w = RandomFloat(5, containerWidth / 2);
 
-	return Rect(height, width, guid);
+	return Rect(h, w, guid);
 }
-
-void MainContainer::SolveRectangles()
-{
-	auto listOfCombos = GenerateCombos();
-		
-}
-
-
 
 std::vector<EdgeCombo> MainContainer::GenerateCombos(EdgeCombo combo, int index)
 {
 	std::vector<EdgeCombo> combos;
 	for (int i = index; i < generatedRectangles.size(); i++)
 	{
-		if(generatedRectangles[i]._width + combo.totalEdge <= mainRectangle._height)
+		if(generatedRectangles[i]._width + combo.totalEdge <= containerHeight)
 		{
 			combo.totalEdge += generatedRectangles[i]._width;
 			combo.edges.insert(std::make_pair(generatedRectangles[i]._guid, width));
@@ -70,23 +67,20 @@ std::vector<EdgeCombo> MainContainer::GenerateCombos(EdgeCombo combo, int index)
 				combos.push_back(combo);
 			}
 		}
-
-		/*if (generatedRectangles[i]._height + combo.totalEdge <= mainRectangle._height)
-		{
-
-			combo.totalEdge += generatedRectangles[i]._height;
-			combo.edges.insert(std::make_pair(generatedRectangles[i]._guid, height));
-			combos.push_back(combo);
-			for (EdgeCombo generatedCombo : GenerateCombos(combo, index + 1))
-			{
-				combos.push_back(generatedCombo);
-			}
-		}*/
 	}
-
 	return combos;
 }
 
+Rect MainContainer::GetLargestRectangle(std::vector<Rect> rectangles)
+{
+	Rect result = Rect(0,0,0);
+	for (Rect rectangle : rectangles)
+	{
+		if (result.Area() < rectangle.Area())
+			result = rectangle;
+	}
+	return result;
+}
 
 float MainContainer::DrawRectangles(ID2D1HwndRenderTarget* m_pRenderTarget, ID2D1SolidColorBrush* m_pLightSlateGrayBrush)
 {
@@ -114,14 +108,14 @@ float MainContainer::DrawRectangles(ID2D1HwndRenderTarget* m_pRenderTarget, ID2D
 	D2D1_RECT_F rectangle1 = D2D1::RectF(
 		basicMargins,
 		basicMargins * 2 + highestRecntangleHeigh,
-		basicMargins + mainRectangle._width,
-		basicMargins * 2 + highestRecntangleHeigh + mainRectangle._height
+		basicMargins + containerWidth,
+		basicMargins * 2 + highestRecntangleHeigh + containerHeight
 	);
 
 	// Draw a filled rectangle.
 	m_pRenderTarget->FillRectangle(&rectangle1, m_pLightSlateGrayBrush);
 
-	return basicMargins * 2 + highestRecntangleHeigh + mainRectangle._height + basicMargins;
+	return basicMargins * 2 + highestRecntangleHeigh + containerHeight + basicMargins;
 }
 
 void MainContainer::DrawSolvedRectangles(ID2D1HwndRenderTarget* m_pRenderTarget, ID2D1SolidColorBrush* m_pLightSlateGrayBrush, float topMargin, float leftMargin)

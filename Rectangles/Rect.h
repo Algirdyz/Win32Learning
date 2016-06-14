@@ -13,5 +13,7 @@ public:
 	int rotation = 0;
 	float topCoordinates = 0;
 	float leftCoordinates = 0;
+
+	float Area();
 };
 
