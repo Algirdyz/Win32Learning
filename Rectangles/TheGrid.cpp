@@ -72,7 +72,7 @@ void TheGrid::SplitColumn(int x, float widthFromLeft)
 		sections[index][x].sizeX = widthFromLeft;
 
 		// Add a new row element
-		sections[index].insert(sections[index].begin() + x + 1, ContainerSection(sections[0][x].sizeY, newColumnWidth));
+		sections[index].insert(sections[index].begin() + x + 1, ContainerSection(sections[index][x].sizeY, newColumnWidth));
 	}
 }
 

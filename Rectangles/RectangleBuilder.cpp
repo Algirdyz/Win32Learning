@@ -21,11 +21,11 @@ std::vector<Rect> RectangleBuilder::FitRectangles(std::vector<Rect> rectangles, 
 	return result;
 }
 
-void RectangleBuilder::GenerateSections(MainContainer container, int addIndexX, int addIndexY, Rect rectangleToAdd)
+MainContainer GenerateSections(MainContainer container, int addIndexX, int addIndexY, Rect rectangleToAdd)
 {
 	// Check if section index is valid
 	if (!container.grid.CheckGridSize(addIndexX, addIndexY))
-		return;
+		return container;
 
 	ContainerSection section = container.grid.GetSectionAt(addIndexY, addIndexX);
 
@@ -73,4 +73,6 @@ void RectangleBuilder::GenerateSections(MainContainer container, int addIndexX, 
 	}
 
 	auto a = 0;
+
+	return container;
 }

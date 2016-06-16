@@ -1,9 +1,9 @@
 #include "stdafx.h"
 #include "Rectangles.h"
 #include "MainContainer.h"
-#include <fstream>
 #include <string>
 #include "Utils.h"
+#include "RectangleBuilder.h"
 
 #pragma comment(linker,"\"/manifestdependency:type='win32' \
 name='Microsoft.Windows.Common-Controls' version='6.0.0.0' \
@@ -367,7 +367,9 @@ LRESULT CALLBACK Rectangles::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPA
 			break;
 			case IDC_SPLIT_BUTTON:
 			{
-				dataContainer.grid.SplitColumn(0, dataContainer.grid.GetSectionAt(0,0).sizeX/2);
+
+				dataContainer = GenerateSections(dataContainer, 0, 0, dataContainer.generatedRectangles[0]);
+				//dataContainer.grid.SplitColumn(0, dataContainer.grid.GetSectionAt(0,0).sizeX/2);
 				Rectangles *pDemoApp = reinterpret_cast<Rectangles *>(static_cast<LONG_PTR>(
 					::GetWindowLongPtrW(
 						hwnd,

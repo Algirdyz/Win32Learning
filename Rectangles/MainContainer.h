@@ -4,6 +4,7 @@
 #include "EdgeCombo.h"
 #include "ContainerSection.h"
 #include "TheGrid.h"
+#pragma once
 
 struct ID2D1SolidColorBrush;
 struct ID2D1HwndRenderTarget;
