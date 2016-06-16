@@ -28,5 +28,6 @@ public:
 	Rect GetLargestRectangle(std::vector<Rect> rectangles);
 	float DrawRectangles(ID2D1HwndRenderTarget* renderTarget, ID2D1SolidColorBrush* solidBrush);
 	void DrawSolvedRectangles(ID2D1HwndRenderTarget* m_pRenderTarget, ID2D1SolidColorBrush* m_pLightSlateGrayBrush, float topMargin, float leftMargin);
+	void DrawFilledSections(ID2D1HwndRenderTarget* m_pRenderTarget, ID2D1SolidColorBrush* m_pLightSlateGrayBrush, float topMargin, float leftMargin);
 };
 

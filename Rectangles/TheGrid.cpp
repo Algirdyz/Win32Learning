@@ -116,9 +116,9 @@ float TheGrid::GetColumnWidth(int index, int endIndex)
 
 void TheGrid::FillSections(int startX, int endX, int startY, int endY)
 {
-	for(int i = startY; i < endY; i++)
+	for(int i = startY; i <= endY; i++)
 	{
-		for (int j = startX; j < endX; j++)
+		for (int j = startX; j <= endX; j++)
 		{
 			sections[i][j].IsFilled = true;
 		}

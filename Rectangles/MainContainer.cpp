@@ -143,3 +143,32 @@ void MainContainer::DrawSolvedRectangles(ID2D1HwndRenderTarget* m_pRenderTarget,
 		rowCoordinatesY += row[0].sizeY;
 	}
 }
+
+void MainContainer::DrawFilledSections(ID2D1HwndRenderTarget* m_pRenderTarget, ID2D1SolidColorBrush* brush, float topMargin, float leftMargin)
+{
+	float rowCoordinatesY = 0;
+	for (int rowIndex = 0; rowIndex < grid.GetNumberOfRows(); rowIndex++)
+	{
+		std::vector<ContainerSection> row = grid.GetRowAt(rowIndex);
+
+		float rowCoordinatesX = 0;
+		for (ContainerSection section : row)
+		{
+			if (!section.IsFilled)
+				continue;
+			float left = leftMargin + rowCoordinatesX;
+			float top = topMargin + rowCoordinatesY;
+			D2D1_RECT_F rectangle = D2D1::RectF(
+				left,
+				top,
+				left + section.sizeX,
+				top + section.sizeY
+			);
+
+			rowCoordinatesX += section.sizeX;
+
+			m_pRenderTarget->FillRectangle(&rectangle, brush);
+		}
+		rowCoordinatesY += row[0].sizeY;
+	}
+}

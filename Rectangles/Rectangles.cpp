@@ -485,6 +485,7 @@ HRESULT Rectangles::OnRender()
 
 		float topMargin = dataContainer.DrawRectangles(m_pRenderTarget, m_pLightSlateGrayBrush);
 
+		dataContainer.DrawFilledSections(m_pRenderTarget, m_pCornflowerBlueBrush, topMargin, 10);
 		dataContainer.DrawSolvedRectangles(m_pRenderTarget, m_pLightSlateGrayBrush, topMargin, 10);
 		
 		hr = m_pRenderTarget->EndDraw();

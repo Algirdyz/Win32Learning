@@ -70,9 +70,9 @@ void GenerateSections(MainContainer* container, int addIndexX, int addIndexY, Re
 	float widthFromLeft = rectangleToAdd._width - container->grid.GetColumnWidth(addIndexX, columnToSplit - 1);
 	
 	// Do splits. If index is less than zero than rectangle ends on a line;
-	if (rowToSplit < 0)
+	if (rowToSplit >= 0)
 		container->grid.SplitRow(rowToSplit, heightFromTop);
-	if (columnToSplit < 0)
+	if (columnToSplit >= 0)
 		container->grid.SplitColumn(columnToSplit, widthFromLeft);
 
 	container->grid.FillSections(addIndexX, columnToSplit, addIndexY, rowToSplit);
