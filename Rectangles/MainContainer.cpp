@@ -5,7 +5,6 @@
 #include <ctime>
 #include <d2d1.h>
 #include "EdgeCombo.h"
-#include <algorithm>
 
 float RandomFloat(float a, float b) {
 	float random = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);

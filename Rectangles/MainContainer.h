@@ -1,8 +1,6 @@
 #include "Rect.h"
-
 #include <vector>
 #include "EdgeCombo.h"
-#include "ContainerSection.h"
 #include "TheGrid.h"
 #pragma once
 

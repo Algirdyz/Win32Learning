@@ -357,6 +357,10 @@ LRESULT CALLBACK Rectangles::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPA
 				float numberToGenerateF = stof(numberToGenerateS);
 
 				dataContainer = MainContainer(heightF, widthF, numberToGenerateF);
+				dataContainer.grid.SplitColumn(0, dataContainer.grid.GetSectionAt(0, 0).sizeX / 3);
+				dataContainer.grid.SplitColumn(0, dataContainer.grid.GetSectionAt(0, 0).sizeX / 3);
+				dataContainer.grid.SplitRow(0, dataContainer.grid.GetSectionAt(0, 0).sizeY / 3);
+				dataContainer.grid.SplitRow(0, dataContainer.grid.GetSectionAt(0, 0).sizeY / 3);
 				Rectangles *pDemoApp = reinterpret_cast<Rectangles *>(static_cast<LONG_PTR>(
 					::GetWindowLongPtrW(
 						hwnd,
@@ -367,9 +371,7 @@ LRESULT CALLBACK Rectangles::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPA
 			break;
 			case IDC_SPLIT_BUTTON:
 			{
-
-				dataContainer = GenerateSections(dataContainer, 0, 0, dataContainer.generatedRectangles[0]);
-				//dataContainer.grid.SplitColumn(0, dataContainer.grid.GetSectionAt(0,0).sizeX/2);
+				GenerateSections(&dataContainer, 0, 0, dataContainer.generatedRectangles[1]);
 				Rectangles *pDemoApp = reinterpret_cast<Rectangles *>(static_cast<LONG_PTR>(
 					::GetWindowLongPtrW(
 						hwnd,

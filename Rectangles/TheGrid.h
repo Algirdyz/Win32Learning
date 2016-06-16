@@ -25,7 +25,11 @@ public:
 	bool CheckGridSize(int x, int y);
 
 	float GetRowHeight(int index);
-	float GetColumnWidth(int index);
+	float GetRowHeight(int index, int endIndex);
 
+	float GetColumnWidth(int index);
+	float GetColumnWidth(int index, int endIndex);
+
+	void FillSections(int startX, int endX, int startY, int endY);
 };
 
