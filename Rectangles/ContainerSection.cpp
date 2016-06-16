@@ -6,6 +6,7 @@ ContainerSection::ContainerSection(float height, float width)
 {
 	sizeY = height;
 	sizeX = width;
+	IsFilled = false;
 }
 
 

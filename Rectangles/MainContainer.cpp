@@ -120,17 +120,27 @@ float MainContainer::DrawRectangles(ID2D1HwndRenderTarget* m_pRenderTarget, ID2D
 
 void MainContainer::DrawSolvedRectangles(ID2D1HwndRenderTarget* m_pRenderTarget, ID2D1SolidColorBrush* m_pLightSlateGrayBrush, float topMargin, float leftMargin)
 {
-	for (int i = 0; i < generatedRectangles.size(); i++)
+	float rowCoordinatesY = 0;
+	for (int rowIndex = 0; rowIndex < grid.GetNumberOfRows(); rowIndex++)
 	{
-		float left = leftMargin + generatedRectangles[i].leftCoordinates;
-		float top = topMargin + generatedRectangles[i].topCoordinates;
-		D2D1_RECT_F rectangle = D2D1::RectF(
-			left,
-			top,
-			left + generatedRectangles[i]._width,
-			top + generatedRectangles[i]._height
-		);
+		std::vector<ContainerSection> row = grid.GetRowAt(rowIndex);
 
-		m_pRenderTarget->DrawRectangle(&rectangle, m_pLightSlateGrayBrush);
+		float rowCoordinatesX = 0;
+		for (ContainerSection section : row)
+		{
+			float left = leftMargin + rowCoordinatesX;
+			float top = topMargin + rowCoordinatesY;
+			D2D1_RECT_F rectangle = D2D1::RectF(
+				left,
+				top,
+				left + section.sizeX,
+				top + section.sizeY
+			);
+
+			rowCoordinatesX += section.sizeX;
+
+			m_pRenderTarget->DrawRectangle(&rectangle, m_pLightSlateGrayBrush);
+		}
+		rowCoordinatesY += row[0].sizeY;
 	}
 }

@@ -14,12 +14,14 @@ processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 #define IDC_GENERATE_BUTTON 101
 #define IDC_WIDTH_EDIT 102
 #define IDC_HEIGHT_EDIT 103
-#define IDC_NUMBER_EDIT 103
+#define IDC_NUMBER_EDIT 104
+#define IDC_SPLIT_BUTTON 105
 
 HWND m_hwndHeight;
 HWND m_hwndWidth;
 HWND m_hwndGenerate;
 HWND hWndButton;
+HWND hWndButton2;
 
 
 // Global Variables:
@@ -172,6 +174,19 @@ HRESULT Rectangles::Initialize()
 			20,
 			m_hwnd,
 			(HMENU)IDC_GENERATE_BUTTON,
+			GetModuleHandle(NULL),
+			NULL);
+
+		hWndButton2 = CreateWindowEx(NULL,
+			L"BUTTON",
+			L"SPLIT",
+			WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,
+			580,
+			10,
+			100,
+			20,
+			m_hwnd,
+			(HMENU)IDC_SPLIT_BUTTON,
 			GetModuleHandle(NULL),
 			NULL);
 
@@ -342,6 +357,17 @@ LRESULT CALLBACK Rectangles::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPA
 				float numberToGenerateF = stof(numberToGenerateS);
 
 				dataContainer = MainContainer(heightF, widthF, numberToGenerateF);
+				Rectangles *pDemoApp = reinterpret_cast<Rectangles *>(static_cast<LONG_PTR>(
+					::GetWindowLongPtrW(
+						hwnd,
+						GWLP_USERDATA
+					)));
+				pDemoApp->OnRender();
+			}
+			break;
+			case IDC_SPLIT_BUTTON:
+			{
+				dataContainer.grid.SplitColumn(0, dataContainer.grid.GetSectionAt(0,0).sizeX/2);
 				Rectangles *pDemoApp = reinterpret_cast<Rectangles *>(static_cast<LONG_PTR>(
 					::GetWindowLongPtrW(
 						hwnd,

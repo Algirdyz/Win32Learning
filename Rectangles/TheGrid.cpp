@@ -6,6 +6,10 @@ TheGrid::TheGrid(float height, float width)
 {
 	gridHeight = height;
 	gridWidth = width;
+
+	std::vector<ContainerSection> firstRow;
+	firstRow.push_back(ContainerSection(height, width));
+	sections.push_back(firstRow);
 }
 
 TheGrid::~TheGrid()
@@ -17,20 +21,38 @@ ContainerSection TheGrid::GetSectionAt(int x, int y)
 	return sections[x][y];
 }
 
+std::vector<ContainerSection> TheGrid::GetRowAt(int index)
+{
+	return sections[index];
+}
+
+int TheGrid::GetNumberOfRows()
+{
+	return sections.size();
+}
+
+int TheGrid::GetNumberOfColumns()
+{
+	return sections[0].size();
+}
+
 void TheGrid::SplitRow(int y, float heightFromTop)
 {
 	// Calculate height of the new row
 	float newRowHeight = sections[y][0].sizeY - heightFromTop;
 
 	// Change existing row size
-	for (ContainerSection loopSection : sections[y])
+	for (int index = 0; index < sections[y].size(); index++)
 	{
-		loopSection.sizeY = heightFromTop;
+		sections[y][index].sizeY = heightFromTop;
 	}
 	// Build new row
 	std::vector<ContainerSection> newRow;
 	newRow.reserve(sections[y].size());
-	for (int i = 0; i < sections[y].size(), i++;)
+
+	auto a = sections[y].size();
+
+	for (int i = 0; i < a; i++)
 	{
 		newRow.push_back(ContainerSection(newRowHeight, sections[y][0].sizeX));
 	}
@@ -44,13 +66,13 @@ void TheGrid::SplitColumn(int x, float widthFromLeft)
 	// Calculate width of the new column
 	float newColumnWidth = sections[0][x].sizeX - widthFromLeft;
 
-	for (std::vector<ContainerSection> row : sections)
+	for (int index = 0; index < sections.size(); index++)
 	{
 		// Change the width of existing row element
-		row[x].sizeX = widthFromLeft;
+		sections[index][x].sizeX = widthFromLeft;
 
 		// Add a new row element
-		row.insert(row.begin() + x + 1, ContainerSection(newColumnWidth, sections[0][x].sizeY));
+		sections[index].insert(sections[index].begin() + x + 1, ContainerSection(sections[0][x].sizeY, newColumnWidth));
 	}
 }
 

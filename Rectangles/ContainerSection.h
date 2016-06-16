@@ -7,5 +7,7 @@ public:
 
 	float sizeY;
 	float sizeX;
+
+	bool IsFilled = false;
 };
 

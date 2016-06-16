@@ -14,6 +14,10 @@ public:
 	~TheGrid();
 
 	ContainerSection GetSectionAt(int x, int y);
+	std::vector<ContainerSection> GetRowAt(int index);
+
+	int GetNumberOfRows();
+	int GetNumberOfColumns();
 
 	void SplitRow(int y, float heightFromTop);
 	void SplitColumn(int x, float widthFromLeft);
@@ -22,5 +26,6 @@ public:
 
 	float GetRowHeight(int index);
 	float GetColumnWidth(int index);
+
 };
 
