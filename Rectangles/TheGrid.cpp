@@ -124,3 +124,125 @@ void TheGrid::FillSections(int startX, int endX, int startY, int endY)
 		}
 	}
 }
+
+std::vector<Coordinates> TheGrid::FindGaps(float height, float width)
+{
+	std::vector<Coordinates> result;
+	for (int index = 0; index < sections.size(); index++)
+	{
+		for (int innerIndex = 0; innerIndex < sections[index].size(); innerIndex++)
+		{
+			// Ignore filled sections
+			if (sections[index][innerIndex].IsFilled)
+				continue;
+
+			// We are looking for a corner. It has to have two neighboring filled sections or edges of the grid
+			bool topEdgeFilled = index == 0 || sections[index - 1][innerIndex].IsFilled;
+			bool bottomEdgeFilled = index + 1 == GetNumberOfRows() || sections[index + 1][innerIndex].IsFilled;
+			bool leftEdgeFilled = innerIndex == 0 || sections[index][innerIndex - 1].IsFilled;
+			bool rightEdgeFilled = innerIndex + 1 == GetNumberOfColumns() || sections[index][innerIndex + 1].IsFilled;
+			
+			bool upperRight = topEdgeFilled && rightEdgeFilled;
+			bool lowerRight = bottomEdgeFilled && rightEdgeFilled;
+			bool upperLeft = topEdgeFilled && leftEdgeFilled;
+			bool lowerLeft = bottomEdgeFilled && leftEdgeFilled;
+
+			if (!(upperRight || lowerRight || upperLeft || lowerLeft))
+				continue;
+
+			// Now we check if it fits, starting with vertical
+			bool verticalFit = false;
+			bool horizontalFit = false;
+
+			bool topUsed = false;
+			bool bottomUsed = false;
+			bool leftUsed = false;
+			bool rightUsed = false;
+
+			if(upperLeft || upperRight)
+			{
+				float totalHeight = 0;
+				for (int i = index; i < sections.size(); i++)
+				{
+					totalHeight += GetRowHeight(i);
+
+					if(totalHeight > height)
+					{
+						verticalFit = true;
+						topUsed = true;
+						break;
+					}
+				}
+			}
+
+			if (!verticalFit)
+			{
+				float totalHeight = 0;
+				for (int i = index; i >= 0; i--)
+				{
+					totalHeight += GetRowHeight(i);
+
+					if (totalHeight > height)
+					{
+						verticalFit = true;
+						bottomUsed = true;
+						break;
+					}
+				}
+			}
+			// Now we do horizontal
+			if(upperLeft || lowerLeft)
+			{
+				float totalWidth = 0;
+				for (int i = innerIndex; i < sections[0].size(); i++)
+				{
+					totalWidth += GetColumnWidth(i);
+					if(totalWidth > width)
+					{
+						horizontalFit = true;
+						leftUsed = true;
+						break;
+					}
+				}
+			}
+			if (!horizontalFit)
+			{
+				float totalWidth = 0;
+				for (int i = innerIndex; i >= 0; i--)
+				{
+					totalWidth += GetColumnWidth(i);
+
+					if (totalWidth > width)
+					{
+						horizontalFit = true;
+						rightUsed = true;
+						break;
+					}
+				}
+			}
+
+			if (horizontalFit && verticalFit)
+			{
+				Corners corners;
+				if(topUsed)
+				{
+					if (leftUsed)
+						corners = Corners::upperLeft;
+					if (rightUsed)
+						corners = Corners::upperRight;
+				}
+				else
+				{
+					if (leftUsed)
+						corners = Corners::lowerLeft;
+					else
+						corners = Corners::lowerRight;
+				}
+
+				Coordinates coords { index, innerIndex, corners};
+				result.push_back(coords);
+			}
+		}
+	}
+	return result;
+}

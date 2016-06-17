@@ -146,6 +146,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ContainerSection.h" />
+    <ClInclude Include="Corners.h" />
     <ClInclude Include="Edge.h" />
     <ClInclude Include="EdgeCombo.h" />
     <ClInclude Include="MainContainer.h" />
@@ -160,6 +161,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ContainerSection.cpp" />
+    <ClCompile Include="Coordinates.h" />
     <ClCompile Include="EdgeCombo.cpp" />
     <ClCompile Include="MainContainer.cpp" />
     <ClCompile Include="Rect.cpp" />

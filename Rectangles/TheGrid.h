@@ -1,6 +1,8 @@
 #pragma once
 #include "ContainerSection.h"
 #include <vector>
+#include "Rect.h"
+#include "Coordinates.h"
 
 class TheGrid
 {
@@ -31,5 +33,7 @@ public:
 	float GetColumnWidth(int index, int endIndex);
 
 	void FillSections(int startX, int endX, int startY, int endY);
+
+	std::vector<Coordinates> FindGaps(float height, float width);
 };
 

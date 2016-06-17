@@ -21,39 +21,74 @@ std::vector<Rect> RectangleBuilder::FitRectangles(std::vector<Rect> rectangles, 
 	return result;
 }
 
-int GetRowIndexToFitRectangle(MainContainer container, int addIndexY, Rect rectangle)
+int GetRowIndexToFitRectangle(MainContainer container, int addIndexY, Rect rectangle, Corners corner)
 {
 	float totalHeight = 0;
-	for (int i = addIndexY; i < container.grid.GetNumberOfRows(); i++)
+	if(corner == upperLeft || corner == upperRight)
 	{
-		totalHeight += container.grid.GetRowHeight(i);
+		for (int i = addIndexY; i < container.grid.GetNumberOfRows(); i++)
+		{
+			totalHeight += container.grid.GetRowHeight(i);
 
-		if (totalHeight > rectangle._height)
-			return i;
+			if (totalHeight > rectangle._height)
+				return i;
 
-		if (totalHeight == rectangle._height)
-			return -1;
+			if (totalHeight == rectangle._height)
+				return -1;
+		}
 	}
+	else
+	{
+		for (int i = addIndexY; i >= 0; i--)
+		{
+			totalHeight += container.grid.GetRowHeight(i);
+
+			if (totalHeight > rectangle._height)
+				return i;
+
+			if (totalHeight == rectangle._height)
+				return -1;
+		}
+	}
+	
 	return -1;
 }
 
-int GetColumnIndexToFitRectangle(MainContainer container, int addIndexX, Rect rectangle)
+int GetColumnIndexToFitRectangle(MainContainer container, int addIndexX, Rect rectangle, Corners corner)
 {
 	float totalWidth = 0;
-	for (int i = addIndexX; i < container.grid.GetNumberOfColumns(); i++)
+	if(corner == upperLeft || corner == lowerLeft)
 	{
-		totalWidth += container.grid.GetColumnWidth(i);
+		for (int i = addIndexX; i < container.grid.GetNumberOfColumns(); i++)
+		{
+			totalWidth += container.grid.GetColumnWidth(i);
 
-		if (totalWidth > rectangle._width)
-			return i;
+			if (totalWidth > rectangle._width)
+				return i;
 
-		if (totalWidth == rectangle._width)
-			return -1;
+			if (totalWidth == rectangle._width)
+				return -1;
+		}
 	}
+	else
+	{
+		for (int i = addIndexX; i >= 0; i--)
+		{
+			totalWidth += container.grid.GetColumnWidth(i);
+
+			if (totalWidth > rectangle._width)
+				return i;
+
+			if (totalWidth == rectangle._width)
+				return -1;
+		}
+	}
+	
 	return -1;
 }
 
-void GenerateSections(MainContainer* container, int addIndexX, int addIndexY, Rect rectangleToAdd)
+
+void InsertRectangleIntoGrid(MainContainer* container, int addIndexX, int addIndexY, Rect rectangleToAdd, Corners corner)
 {
 	// Check if section index is valid
 	if (!container->grid.CheckGridSize(addIndexX, addIndexY))
@@ -62,11 +97,11 @@ void GenerateSections(MainContainer* container, int addIndexX, int addIndexY, Re
 	ContainerSection section = container->grid.GetSectionAt(addIndexY, addIndexX);
 
 	// Prepare row split			
-	int rowToSplit = GetRowIndexToFitRectangle(*container, addIndexY, rectangleToAdd);
+	int rowToSplit = GetRowIndexToFitRectangle(*container, addIndexY, rectangleToAdd, corner);
 	float heightFromTop = rectangleToAdd._height - container->grid.GetRowHeight(addIndexY, rowToSplit - 1);		
 		
 	// Prepare column split
-	int columnToSplit = GetColumnIndexToFitRectangle(*container, addIndexX, rectangleToAdd);
+	int columnToSplit = GetColumnIndexToFitRectangle(*container, addIndexX, rectangleToAdd, corner);
 	float widthFromLeft = rectangleToAdd._width - container->grid.GetColumnWidth(addIndexX, columnToSplit - 1);
 	
 	// Do splits. If index is less than zero than rectangle ends on a line;

@@ -358,9 +358,9 @@ LRESULT CALLBACK Rectangles::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPA
 
 				dataContainer = MainContainer(heightF, widthF, numberToGenerateF);
 				dataContainer.grid.SplitColumn(0, dataContainer.grid.GetSectionAt(0, 0).sizeX / 3);
-				dataContainer.grid.SplitColumn(0, dataContainer.grid.GetSectionAt(0, 0).sizeX / 3);
-				dataContainer.grid.SplitRow(0, dataContainer.grid.GetSectionAt(0, 0).sizeY / 3);
-				dataContainer.grid.SplitRow(0, dataContainer.grid.GetSectionAt(0, 0).sizeY / 3);
+				//dataContainer.grid.SplitColumn(0, dataContainer.grid.GetSectionAt(0, 0).sizeX / 3);
+				//dataContainer.grid.SplitRow(0, dataContainer.grid.GetSectionAt(0, 0).sizeY / 3);
+				//dataContainer.grid.SplitRow(0, dataContainer.grid.GetSectionAt(0, 0).sizeY / 3);
 				Rectangles *pDemoApp = reinterpret_cast<Rectangles *>(static_cast<LONG_PTR>(
 					::GetWindowLongPtrW(
 						hwnd,
@@ -371,7 +371,8 @@ LRESULT CALLBACK Rectangles::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPA
 			break;
 			case IDC_SPLIT_BUTTON:
 			{
-				GenerateSections(&dataContainer, 0, 0, dataContainer.generatedRectangles[1]);
+				auto a = dataContainer.grid.FindGaps(dataContainer.generatedRectangles[5]._height, dataContainer.generatedRectangles[5]._width);
+				InsertRectangleIntoGrid(&dataContainer, 0, 0, dataContainer.generatedRectangles[1]);
 				Rectangles *pDemoApp = reinterpret_cast<Rectangles *>(static_cast<LONG_PTR>(
 					::GetWindowLongPtrW(
 						hwnd,

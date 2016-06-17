@@ -16,6 +16,12 @@
     <Filter Include="Header Files\Enums">
       <UniqueIdentifier>{ef83740a-a633-49ee-8cff-4ba3300eb847}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\TheGrid">
+      <UniqueIdentifier>{6e7f0595-e26c-4aee-9898-43dd7fb73f1a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\TheGrid">
+      <UniqueIdentifier>{90bfdd7d-1f5d-4802-8d9b-7cb7fcd6c40a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -51,11 +57,14 @@
     <ClInclude Include="RectangleBuilder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ContainerSection.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="TheGrid.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\TheGrid</Filter>
+    </ClInclude>
+    <ClInclude Include="ContainerSection.h">
+      <Filter>Header Files\TheGrid</Filter>
+    </ClInclude>
+    <ClInclude Include="Corners.h">
+      <Filter>Header Files\Enums</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -80,11 +89,14 @@
     <ClCompile Include="RectangleBuilder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ContainerSection.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="TheGrid.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\TheGrid</Filter>
+    </ClCompile>
+    <ClCompile Include="ContainerSection.cpp">
+      <Filter>Source Files\TheGrid</Filter>
+    </ClCompile>
+    <ClCompile Include="Coordinates.h">
+      <Filter>Header Files\TheGrid</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
