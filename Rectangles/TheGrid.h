@@ -11,6 +11,8 @@ private:
 	float gridWidth;
 
 	std::vector<std::vector<ContainerSection>> sections;
+
+	bool CheckGap(Coordinates coordinates, float height, float width, bool cornerUsed);
 public:
 	TheGrid(float height, float width);
 	~TheGrid();
@@ -34,6 +36,12 @@ public:
 
 	void FillSections(int startX, int endX, int startY, int endY);
 
+	int GetRowIndexToFitRectangle(int addIndexY, float height, Corners corner, bool* wasRowSplit);
+
+	int GetColumnIndexToFitRectangle(int addIndexX, float width, Corners corner, bool* wasColumnSplit);
+
 	std::vector<Coordinates> FindGaps(float height, float width);
+
+
 };
 

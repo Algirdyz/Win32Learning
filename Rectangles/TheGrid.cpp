@@ -1,6 +1,48 @@
 #include "stdafx.h"
 #include "TheGrid.h"
+#include "RectangleBuilder.h"
 
+
+bool TheGrid::CheckGap(Coordinates coordinates, float height, float width, bool cornerUsed)
+{
+	if (cornerUsed == false)
+		return false;
+	
+	bool a = true;
+	int lastRowIndex = GetRowIndexToFitRectangle(coordinates.y, height, coordinates.corners, &a);
+	int lastColumnIndex = GetColumnIndexToFitRectangle(coordinates.x, width, coordinates.corners, &a);
+
+	if (lastRowIndex < -1)
+		return false;
+	if (lastColumnIndex < -1)
+		return false;
+	
+	int lowerRowIndex = coordinates.y;
+	int higherRowIndex = lastRowIndex;
+	if(lowerRowIndex > higherRowIndex)
+	{
+		lowerRowIndex = lastRowIndex;
+		higherRowIndex = coordinates.y;
+	}
+
+	int lowerColumnIndex = coordinates.x;
+	int higherColumnIndex = lastColumnIndex;
+	if (lowerColumnIndex > higherColumnIndex)
+	{
+		lowerColumnIndex = lastColumnIndex;
+		higherColumnIndex = coordinates.x;
+	}
+
+	for(int i = lowerRowIndex; i <= higherRowIndex; i++)
+	{
+		for(int j = lowerColumnIndex; j <= higherColumnIndex; j++)
+		{
+			if (sections[i][j].IsFilled)
+				return false;
+		}
+	}
+	return true;
+}
 
 TheGrid::TheGrid(float height, float width) : gridHeight(height), gridWidth(width)
 {
@@ -15,7 +57,7 @@ TheGrid::~TheGrid()
 
 ContainerSection TheGrid::GetSectionAt(int x, int y)
 {
-	return sections[x][y];
+	return sections[y][x];
 }
 
 std::vector<ContainerSection> TheGrid::GetRowAt(int index)
@@ -49,7 +91,9 @@ void TheGrid::SplitRow(int y, float heightFromTop)
 	
 	for (int i = 0; i < sections[y].size(); i++)
 	{
-		newRow.push_back(ContainerSection(newRowHeight, sections[y][i].sizeX));
+		ContainerSection newSection = ContainerSection(newRowHeight, sections[y][i].sizeX);
+		newSection.IsFilled = sections[y][i].IsFilled;
+		newRow.push_back(newSection);
 	}
 
 	// Insert new row at index
@@ -67,7 +111,9 @@ void TheGrid::SplitColumn(int x, float widthFromLeft)
 		sections[index][x].sizeX = widthFromLeft;
 
 		// Add a new row element
-		sections[index].insert(sections[index].begin() + x + 1, ContainerSection(sections[index][x].sizeY, newColumnWidth));
+		ContainerSection newSection = ContainerSection(sections[index][x].sizeY, newColumnWidth);
+		newSection.IsFilled = sections[index][x].IsFilled;
+		sections[index].insert(sections[index].begin() + x + 1, newSection);
 	}
 }
 
@@ -125,6 +171,73 @@ void TheGrid::FillSections(int startX, int endX, int startY, int endY)
 	}
 }
 
+// Returns index of last row to fit. If it fit evenly returns -1. If it does not fit, returns -2.
+int TheGrid::GetRowIndexToFitRectangle(int addIndexY, float height, Corners corner, bool* wasRowSplit)
+{
+	float totalHeight = 0;
+	if (corner == upperLeft || corner == upperRight)
+	{
+		for (int i = addIndexY; i < GetNumberOfRows(); i++)
+		{
+			totalHeight += GetRowHeight(i);
+
+			if (totalHeight == height)
+				*wasRowSplit = true;
+
+			if (totalHeight > height)
+				return i;
+		}
+	}
+	else
+	{
+		for (int i = addIndexY; i >= 0; i--)
+		{
+			totalHeight += GetRowHeight(i);
+
+			if (totalHeight == height)
+				*wasRowSplit = true;
+
+			if (totalHeight > height)
+				return i;
+		}
+	}
+
+	return -2;
+}
+
+int TheGrid::GetColumnIndexToFitRectangle(int addIndexX, float width, Corners corner, bool* wasColumnSplit)
+{
+	float totalWidth = 0;
+	if (corner == upperLeft || corner == lowerLeft)
+	{
+		for (int i = addIndexX; i < GetNumberOfColumns(); i++)
+		{
+			totalWidth += GetColumnWidth(i);
+
+			if (totalWidth == width)
+				*wasColumnSplit = true;
+
+			if (totalWidth >= width)
+				return i;
+		}
+	}
+	else
+	{
+		for (int i = addIndexX; i >= 0; i--)
+		{
+			totalWidth += GetColumnWidth(i);
+
+			if (totalWidth == width)
+				*wasColumnSplit = true;
+
+			if (totalWidth >= width)
+				return i;
+		}
+	}
+
+	return -2;
+}
+
 std::vector<Coordinates> TheGrid::FindGaps(float height, float width)
 {
 	std::vector<Coordinates> result;
@@ -150,98 +263,21 @@ std::vector<Coordinates> TheGrid::FindGaps(float height, float width)
 			if (!(upperRight || lowerRight || upperLeft || lowerLeft))
 				continue;
 
-			// Now we check if it fits, starting with vertical
-			bool verticalFit = false;
-			bool horizontalFit = false;
-
-			bool topUsed = false;
-			bool bottomUsed = false;
-			bool leftUsed = false;
-			bool rightUsed = false;
-
-			if(upperLeft || upperRight)
-			{
-				float totalHeight = 0;
-				for (int i = index; i < sections.size(); i++)
-				{
-					totalHeight += GetRowHeight(i);
-
-					if(totalHeight > height)
-					{
-						verticalFit = true;
-						topUsed = true;
-						break;
-					}
-				}
-			}
-
-			if (!verticalFit)
-			{
-				float totalHeight = 0;
-				for (int i = index; i >= 0; i--)
-				{
-					totalHeight += GetRowHeight(i);
-
-					if (totalHeight > height)
-					{
-						verticalFit = true;
-						bottomUsed = true;
-						break;
-					}
-				}
-			}
-			// Now we do horizontal
-			if(upperLeft || lowerLeft)
-			{
-				float totalWidth = 0;
-				for (int i = innerIndex; i < sections[0].size(); i++)
-				{
-					totalWidth += GetColumnWidth(i);
-					if(totalWidth > width)
-					{
-						horizontalFit = true;
-						leftUsed = true;
-						break;
-					}
-				}
-			}
-			if (!horizontalFit)
-			{
-				float totalWidth = 0;
-				for (int i = innerIndex; i >= 0; i--)
-				{
-					totalWidth += GetColumnWidth(i);
-
-					if (totalWidth > width)
-					{
-						horizontalFit = true;
-						rightUsed = true;
-						break;
-					}
-				}
-			}
-
-			if (horizontalFit && verticalFit)
-			{
-				Corners corners;
-				if(topUsed)
-				{
-					if (leftUsed)
-						corners = Corners::upperLeft;
-					if (rightUsed)
-						corners = Corners::upperRight;
-				}
-				else
-				{
-					if (leftUsed)
-						corners = Corners::lowerLeft;
-					else
-						corners = Corners::lowerRight;
-				}
-
-				Coordinates coords { index, innerIndex, corners};
+			auto coords = Coordinates{ innerIndex, index, Corners::upperLeft };
+			if(CheckGap(coords, height, width, upperLeft))
 				result.push_back(coords);
-			}
+			
+			coords.corners = Corners::upperRight;
+			if (CheckGap(coords, height, width, upperRight))
+				result.push_back(coords);
+					
+			coords.corners = Corners::lowerLeft;
+			if (CheckGap(coords, height, width, lowerLeft))
+				result.push_back(coords);
+
+			coords.corners = Corners::lowerRight;
+			if (CheckGap(coords, height, width, lowerRight))
+				result.push_back(coords);
 		}
 	}
 	return result;

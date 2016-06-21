@@ -8,8 +8,7 @@
 struct Coordinates;
 
 void InsertRectangleIntoGrid(MainContainer* container, int addIndexX, int addIndexY, Rect rectangleToAdd, Corners corner = lowerLeft);
-int GetRowIndexToFitRectangle(MainContainer container, int addIndexX, Rect rectangle, Corners corner);
-int GetColumnIndexToFitRectangle(MainContainer container, int addIndexY, Rect rectangle, Corners corner);
+void FitRectangles(MainContainer* container, HWND hwnd);
 
 class RectangleBuilder
 {
@@ -18,6 +17,6 @@ public:
 	RectangleBuilder();
 	~RectangleBuilder();
 
-	std::vector<Rect> FitRectangles(std::vector<Rect> rectangles, Rect mainRectangle);
+	
 };
 

@@ -58,6 +58,8 @@ public:
 	void RunMessageLoop();
 
 
+	// Draw content.
+	HRESULT OnRender();
 
 private:
 	// Initialize device-independent resources.
@@ -69,8 +71,6 @@ private:
 	// Release device-dependent resource.
 	void DiscardDeviceResources();
 
-	// Draw content.
-	HRESULT OnRender();
 
 	// Resize the render target.
 	void OnResize(
