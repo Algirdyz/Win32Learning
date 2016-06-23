@@ -6,6 +6,8 @@
 #include <d2d1.h>
 #include "EdgeCombo.h"
 #include "Utils.h"
+#include <algorithm>
+#include <functional>
 
 
 MainContainer::MainContainer(int mainHeight, int mainWidth, int amountToGenerate)
@@ -21,7 +23,7 @@ MainContainer::MainContainer(int mainHeight, int mainWidth, int amountToGenerate
 	for (int i = 0; i < amountToGenerate; i++) {
 		generatedRectangles.push_back(GenerateRandomRectangle(i + 1));
 	}
-
+	sort(generatedRectangles.begin(), generatedRectangles.end(), std::greater<Rect>());
 }
 
 

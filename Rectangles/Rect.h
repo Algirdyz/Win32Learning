@@ -12,6 +12,9 @@ public:
 
 	int rotation = 0;
 
-	float Area();
+	bool operator>(const Rect&) const;
+	bool operator<(const Rect&) const;
+
+	float Area() const;
 };
 

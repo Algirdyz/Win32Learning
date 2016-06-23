@@ -14,7 +14,17 @@ Rect::~Rect()
 {
 }
 
-float Rect::Area()
+bool Rect::operator>(const Rect &other) const
+{
+	return Area() > other.Area();
+}
+
+bool Rect::operator<(const Rect &other) const
+{
+	return Area() < other.Area();
+}
+
+float Rect::Area() const
 {
 	return _height * _width;
 }
