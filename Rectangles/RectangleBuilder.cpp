@@ -60,7 +60,7 @@ void InsertRectangleIntoGrid(MainContainer* container, int addIndexX, int addInd
 		widthFromLeft = container->grid.GetColumnWidth(columnToSplit, addIndexX) - rectangleToAdd._width;
 	
 	
-	// Do splits. If index is less than zero than rectangle ends on a line;
+	// Do splits. We do not split if methods above returned a true boolean. Which means that a rectangle ends on a line.
 	if (!(*rowNoSplit))
 		container->grid.SplitRow(rowToSplit, heightFromTop);
 	if (!*columnNoSplit)

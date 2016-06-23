@@ -1,13 +1,11 @@
 #include "stdafx.h"
 #include "TheGrid.h"
 #include "RectangleBuilder.h"
+#include "Utils.h"
 
 
-bool TheGrid::CheckGap(Coordinates coordinates, float height, float width, bool cornerUsed)
+bool TheGrid::CheckGap(Coordinates coordinates, float height, float width)
 {
-	if (cornerUsed == false)
-		return false;
-	
 	bool a = true;
 	int lastRowIndex = GetRowIndexToFitRectangle(coordinates.y, height, coordinates.corners, &a);
 	int lastColumnIndex = GetColumnIndexToFitRectangle(coordinates.x, width, coordinates.corners, &a);
@@ -33,15 +31,58 @@ bool TheGrid::CheckGap(Coordinates coordinates, float height, float width, bool 
 		higherColumnIndex = coordinates.x;
 	}
 
+	bool cornerFound = false;
+
+	bool topEdgeFilled = false;
+	bool bottomEdgeFilled = false;
+	bool leftEdgeFilled = false;
+	bool rightEdgeFilled = false;
+
 	for(int i = lowerRowIndex; i <= higherRowIndex; i++)
 	{
 		for(int j = lowerColumnIndex; j <= higherColumnIndex; j++)
 		{
+			// If any sections are filled, this gap is not valid.
 			if (sections[i][j].IsFilled)
 				return false;
+
+			// Now we find corners.
+			if(!cornerFound)
+			{
+				switch (coordinates.corners)
+				{
+				case upperLeft:
+					if (!topEdgeFilled && i == lowerRowIndex && (i == 0 || sections[i - 1][j].IsFilled))
+						topEdgeFilled = true;
+					if (!leftEdgeFilled && j == lowerColumnIndex && (j == 0 || sections[i][j - 1].IsFilled))
+						leftEdgeFilled = true;
+					break;
+				case lowerLeft:
+					if (!bottomEdgeFilled && i == higherRowIndex && (i + 1 == GetNumberOfRows() || sections[i + 1][j].IsFilled))
+						bottomEdgeFilled = true;
+					if (!leftEdgeFilled && j == lowerColumnIndex && (j == 0 || sections[i][j - 1].IsFilled))
+						leftEdgeFilled = true;
+					break;
+				case upperRight:
+					if (!topEdgeFilled && i == lowerRowIndex && (i == 0 || sections[i - 1][j].IsFilled))
+						topEdgeFilled = true;
+					if (!rightEdgeFilled && j == higherColumnIndex && (j + 1 == GetNumberOfColumns() || sections[i][j + 1].IsFilled))
+						rightEdgeFilled = true;
+					break;
+				case lowerRight:
+					if (!bottomEdgeFilled && i == higherRowIndex && (i + 1 == GetNumberOfRows() || sections[i + 1][j].IsFilled))
+						bottomEdgeFilled = true;
+					if (!rightEdgeFilled && j == higherColumnIndex && (j + 1 == GetNumberOfColumns() || sections[i][j + 1].IsFilled))
+						rightEdgeFilled = true;
+					break;
+				}
+
+				if ((topEdgeFilled && leftEdgeFilled) || (topEdgeFilled && rightEdgeFilled) || (bottomEdgeFilled && leftEdgeFilled) || (bottomEdgeFilled && rightEdgeFilled))
+					cornerFound = true;
+			}
 		}
 	}
-	return true;
+	return cornerFound;
 }
 
 TheGrid::TheGrid(float height, float width) : gridHeight(height), gridWidth(width)
@@ -93,6 +134,7 @@ void TheGrid::SplitRow(int y, float heightFromTop)
 	{
 		ContainerSection newSection = ContainerSection(newRowHeight, sections[y][i].sizeX);
 		newSection.IsFilled = sections[y][i].IsFilled;
+		newSection.Color = sections[y][i].Color;
 		newRow.push_back(newSection);
 	}
 
@@ -113,6 +155,7 @@ void TheGrid::SplitColumn(int x, float widthFromLeft)
 		// Add a new row element
 		ContainerSection newSection = ContainerSection(sections[index][x].sizeY, newColumnWidth);
 		newSection.IsFilled = sections[index][x].IsFilled;
+		newSection.Color = sections[index][x].Color;
 		sections[index].insert(sections[index].begin() + x + 1, newSection);
 	}
 }
@@ -162,11 +205,13 @@ float TheGrid::GetColumnWidth(int index, int endIndex)
 
 void TheGrid::FillSections(int startX, int endX, int startY, int endY)
 {
+	auto color = D2D1::ColorF(RandomFloat(0, 1), RandomFloat(0, 1), RandomFloat(0, 1), 1);
 	for(int i = startY; i <= endY; i++)
 	{
 		for (int j = startX; j <= endX; j++)
 		{
 			sections[i][j].IsFilled = true;
+			sections[i][j].Color = color;
 		}
 	}
 }
@@ -249,34 +294,21 @@ std::vector<Coordinates> TheGrid::FindGaps(float height, float width)
 			if (sections[index][innerIndex].IsFilled)
 				continue;
 
-			// We are looking for a corner. It has to have two neighboring filled sections or edges of the grid
-			bool topEdgeFilled = index == 0 || sections[index - 1][innerIndex].IsFilled;
-			bool bottomEdgeFilled = index + 1 == GetNumberOfRows() || sections[index + 1][innerIndex].IsFilled;
-			bool leftEdgeFilled = innerIndex == 0 || sections[index][innerIndex - 1].IsFilled;
-			bool rightEdgeFilled = innerIndex + 1 == GetNumberOfColumns() || sections[index][innerIndex + 1].IsFilled;
-			
-			bool upperRight = topEdgeFilled && rightEdgeFilled;
-			bool lowerRight = bottomEdgeFilled && rightEdgeFilled;
-			bool upperLeft = topEdgeFilled && leftEdgeFilled;
-			bool lowerLeft = bottomEdgeFilled && leftEdgeFilled;
-
-			if (!(upperRight || lowerRight || upperLeft || lowerLeft))
-				continue;
-
+			// Check check the section for a gap in all directions
 			auto coords = Coordinates{ innerIndex, index, Corners::upperLeft };
-			if(CheckGap(coords, height, width, upperLeft))
+			if (CheckGap(coords, height, width))
 				result.push_back(coords);
-			
+						
 			coords.corners = Corners::upperRight;
-			if (CheckGap(coords, height, width, upperRight))
+			if (CheckGap(coords, height, width))
 				result.push_back(coords);
 					
 			coords.corners = Corners::lowerLeft;
-			if (CheckGap(coords, height, width, lowerLeft))
+			if (CheckGap(coords, height, width))
 				result.push_back(coords);
 
 			coords.corners = Corners::lowerRight;
-			if (CheckGap(coords, height, width, lowerRight))
+			if (CheckGap(coords, height, width))
 				result.push_back(coords);
 		}
 	}

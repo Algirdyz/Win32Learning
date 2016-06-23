@@ -1,4 +1,7 @@
 #pragma once
+#include <d2d1helper.h>
+
+
 class ContainerSection
 {
 public:
@@ -9,5 +12,7 @@ public:
 	float sizeX;
 
 	bool IsFilled = false;
+
+	D2D1::ColorF Color = D2D1::ColorF::CornflowerBlue;
 };
 

@@ -12,7 +12,8 @@ private:
 
 	std::vector<std::vector<ContainerSection>> sections;
 
-	bool CheckGap(Coordinates coordinates, float height, float width, bool cornerUsed);
+	bool CheckGap(Coordinates coordinates, float height, float width);
+
 public:
 	TheGrid(float height, float width);
 	~TheGrid();

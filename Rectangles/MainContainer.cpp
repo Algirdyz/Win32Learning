@@ -5,13 +5,8 @@
 #include <ctime>
 #include <d2d1.h>
 #include "EdgeCombo.h"
+#include "Utils.h"
 
-float RandomFloat(float a, float b) {
-	float random = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
-	float diff = b - a;
-	float r = random * diff;
-	return a + r;
-}
 
 MainContainer::MainContainer(int mainHeight, int mainWidth, int amountToGenerate)
 	: grid(mainHeight, mainWidth)
@@ -169,7 +164,7 @@ void MainContainer::DrawFilledSections(ID2D1HwndRenderTarget* m_pRenderTarget, I
 			);
 
 			rowCoordinatesX += section.sizeX;
-
+			brush->SetColor(section.Color);
 			m_pRenderTarget->FillRectangle(&rectangle, brush);
 		}
 		rowCoordinatesY += row[0].sizeY;

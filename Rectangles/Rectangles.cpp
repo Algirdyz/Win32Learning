@@ -347,8 +347,8 @@ LRESULT CALLBACK Rectangles::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPA
 				std::string widthS = std::string(width.begin(), width.end());
 				std::string numberToGenerateS = std::string(numberOfRectangles.begin(), numberOfRectangles.end());
 
-				auto a = Utils::is_number(heightS);
-				if (!(Utils::is_number(heightS) && Utils::is_number(widthS) && Utils::is_number(numberToGenerateS))) {
+				auto a = is_number(heightS);
+				if (!(is_number(heightS) && is_number(widthS) && is_number(numberToGenerateS))) {
 					break;
 				}
 
