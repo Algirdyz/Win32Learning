@@ -372,6 +372,8 @@ LRESULT CALLBACK Rectangles::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPA
 			case IDC_SPLIT_BUTTON:
 			{
 				auto result = SolveRectangles(&dataContainer, hwnd);
+
+				
 				/*auto a = dataContainer.grid.FindGaps(dataContainer.generatedRectangles[5]._height, dataContainer.generatedRectangles[5]._width);
 				InsertRectangleIntoGrid(&dataContainer, 0, 0, dataContainer.generatedRectangles[1]);*/
 				Rectangles *pDemoApp = reinterpret_cast<Rectangles *>(static_cast<LONG_PTR>(::GetWindowLongPtrW(hwnd, GWLP_USERDATA)));

@@ -111,23 +111,24 @@ void InsertRectangleIntoGrid(MainContainer* container, Coordinates coords, Rect 
 	if (!*columnNoSplit)
 		container->grid.SplitColumn(columnToSplit, widthFromLeft);
 
-	delete rowNoSplit;
-	delete columnNoSplit;
-
-	// Fill sections based on corner
+	
+	// Fill sections based on corner. Pointer to bool is added to increment the row/column index if one was inserted.
 	switch (coords.corners)
 	{
 	case upperLeft:
 		container->grid.FillSections(coords.x, columnToSplit, coords.y, rowToSplit, rectangleToAdd._color);
 		break;
 	case upperRight:
-		container->grid.FillSections(columnToSplit + 1, coords.x + 1, coords.y, rowToSplit, rectangleToAdd._color);
+		container->grid.FillSections(columnToSplit + !*columnNoSplit, coords.x + !*columnNoSplit, coords.y, rowToSplit, rectangleToAdd._color);
 		break;
 	case lowerLeft:
-		container->grid.FillSections(coords.x, columnToSplit, rowToSplit + 1, coords.y + 1, rectangleToAdd._color);
+		container->grid.FillSections(coords.x, columnToSplit, rowToSplit + !(*rowNoSplit), coords.y + !(*rowNoSplit), rectangleToAdd._color);
 		break;
 	case lowerRight:
-		container->grid.FillSections(columnToSplit + 1, coords.x + 1, rowToSplit + 1, coords.y + 1, rectangleToAdd._color);
+		container->grid.FillSections(columnToSplit + !*columnNoSplit, coords.x + !*columnNoSplit, rowToSplit + !(*rowNoSplit), coords.y + !(*rowNoSplit), rectangleToAdd._color);
 		break;
 	}
+
+	delete rowNoSplit;
+	delete columnNoSplit;
 }
