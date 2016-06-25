@@ -8,7 +8,7 @@
 
 struct Coordinates;
 
-void InsertRectangleIntoGrid(MainContainer* container, int addIndexX, int addIndexY, Rect rectangleToAdd, Corners corner = lowerLeft);
+void InsertRectangleIntoGrid(MainContainer* container, Coordinates coords, Rect rectangleToAdd);
 ReturnCode FitRectangles(MainContainer* container, MainContainer* originalContainer, HWND hwnd, int rectangleIndex = 0);
 ReturnCode SolveRectangles(MainContainer* container, HWND hwnd);
 

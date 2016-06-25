@@ -293,22 +293,32 @@ std::vector<Coordinates> TheGrid::FindGaps(float height, float width)
 			if (sections[index][innerIndex].IsFilled)
 				continue;
 
-			// Check check the section for a gap in all directions
-			auto coords = Coordinates{ innerIndex, index, Corners::upperLeft };
-			if (CheckGap(coords, height, width))
-				result.push_back(coords);
-						
-			coords.corners = Corners::upperRight;
-			if (CheckGap(coords, height, width))
-				result.push_back(coords);
-					
-			coords.corners = Corners::lowerLeft;
-			if (CheckGap(coords, height, width))
-				result.push_back(coords);
+			// Do a separate check for both rotation possibilities
+			float usedHeight = height;
+			float usedWidth = width;
 
-			coords.corners = Corners::lowerRight;
-			if (CheckGap(coords, height, width))
-				result.push_back(coords);
+			for(int rotationIndex = 0; rotationIndex < 2; rotationIndex++)
+			{
+				// Check check the section for a gap in all directions
+				auto coords = Coordinates{ innerIndex, index, Corners::upperLeft, rotationIndex };
+				if (CheckGap(coords, usedHeight, usedWidth))
+					result.push_back(coords);
+
+				coords.corners = Corners::upperRight;
+				if (CheckGap(coords, usedHeight, usedWidth))
+					result.push_back(coords);
+
+				coords.corners = Corners::lowerLeft;
+				if (CheckGap(coords, usedHeight, usedWidth))
+					result.push_back(coords);
+
+				coords.corners = Corners::lowerRight;
+				if (CheckGap(coords, usedHeight, usedWidth))
+					result.push_back(coords);
+
+				usedHeight = width;
+				usedWidth = height;
+			}			
 		}
 	}
 	return result;

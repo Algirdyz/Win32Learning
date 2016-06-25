@@ -8,4 +8,5 @@ struct Coordinates
 	int x;
 	int y;
 	Corners corners;
+	int rotation;
 };

@@ -43,7 +43,7 @@ ReturnCode FitRectangles(MainContainer* container, MainContainer* originalContai
 	{
 		auto loopContainer = newContainer;
 
-		InsertRectangleIntoGrid(&loopContainer, remainingGaps[j].x, remainingGaps[j].y, rectangle, remainingGaps[j].corners);
+		InsertRectangleIntoGrid(&loopContainer, remainingGaps[j], rectangle);
 		loopContainer.addedRectangles.push_back(rectangle);
 
 		*originalContainer = loopContainer;
@@ -73,33 +73,36 @@ ReturnCode SolveRectangles(MainContainer* container, HWND hwnd)
 	return result;
 }
 
-void InsertRectangleIntoGrid(MainContainer* container, int addIndexX, int addIndexY, Rect rectangleToAdd, Corners corner)
+void InsertRectangleIntoGrid(MainContainer* container, Coordinates coords, Rect rectangleToAdd)
 {
 	// Check if section index is valid
-	if (!container->grid.CheckGridSize(addIndexY, addIndexX))
+	if (!container->grid.CheckGridSize(coords.y, coords.x))
 		return;
 
-	ContainerSection section = container->grid.GetSectionAt(addIndexX, addIndexY);
+	int height = coords.rotation == 0 ? rectangleToAdd._height : rectangleToAdd._width;
+	int width = coords.rotation == 0 ? rectangleToAdd._width : rectangleToAdd._height;
+
+	ContainerSection section = container->grid.GetSectionAt(coords.x, coords.y);
 
 	// Prepare row split
 	bool *rowNoSplit = new bool;
 	*rowNoSplit = false;
-	int rowToSplit = container->grid.GetRowIndexToFitRectangle(addIndexY, rectangleToAdd._height, corner, rowNoSplit);
+	int rowToSplit = container->grid.GetRowIndexToFitRectangle(coords.y, height, coords.corners, rowNoSplit);
 	float heightFromTop;
-	if (corner == upperLeft || corner == upperRight)
-		heightFromTop = rectangleToAdd._height - container->grid.GetRowHeight(addIndexY, rowToSplit - 1);
+	if (coords.corners == upperLeft || coords.corners == upperRight)
+		heightFromTop = height - container->grid.GetRowHeight(coords.y, rowToSplit - 1);
 	else
-		heightFromTop = container->grid.GetRowHeight(rowToSplit, addIndexY) - rectangleToAdd._height;
+		heightFromTop = container->grid.GetRowHeight(rowToSplit, coords.y) - height;
 
 	// Prepare column split
 	bool *columnNoSplit = new bool;
 	*columnNoSplit = false;
-	int columnToSplit = container->grid.GetColumnIndexToFitRectangle(addIndexX, rectangleToAdd._width, corner, columnNoSplit);
+	int columnToSplit = container->grid.GetColumnIndexToFitRectangle(coords.x, width, coords.corners, columnNoSplit);
 	float widthFromLeft;
-	if (corner == upperLeft || corner == lowerLeft)
-		widthFromLeft = rectangleToAdd._width - container->grid.GetColumnWidth(addIndexX, columnToSplit - 1);
+	if (coords.corners == upperLeft || coords.corners == lowerLeft)
+		widthFromLeft = width - container->grid.GetColumnWidth(coords.x, columnToSplit - 1);
 	else
-		widthFromLeft = container->grid.GetColumnWidth(columnToSplit, addIndexX) - rectangleToAdd._width;
+		widthFromLeft = container->grid.GetColumnWidth(columnToSplit, coords.x) - width;
 	
 	
 	// Do splits. We do not split if methods above returned a true boolean. Which means that a rectangle ends on a line.
@@ -112,19 +115,19 @@ void InsertRectangleIntoGrid(MainContainer* container, int addIndexX, int addInd
 	delete columnNoSplit;
 
 	// Fill sections based on corner
-	switch (corner)
+	switch (coords.corners)
 	{
 	case upperLeft:
-		container->grid.FillSections(addIndexX, columnToSplit, addIndexY, rowToSplit, rectangleToAdd._color);
+		container->grid.FillSections(coords.x, columnToSplit, coords.y, rowToSplit, rectangleToAdd._color);
 		break;
 	case upperRight:
-		container->grid.FillSections(columnToSplit + 1, addIndexX + 1, addIndexY, rowToSplit, rectangleToAdd._color);
+		container->grid.FillSections(columnToSplit + 1, coords.x + 1, coords.y, rowToSplit, rectangleToAdd._color);
 		break;
 	case lowerLeft:
-		container->grid.FillSections(addIndexX, columnToSplit, rowToSplit + 1, addIndexY + 1, rectangleToAdd._color);
+		container->grid.FillSections(coords.x, columnToSplit, rowToSplit + 1, coords.y + 1, rectangleToAdd._color);
 		break;
 	case lowerRight:
-		container->grid.FillSections(columnToSplit + 1, addIndexX + 1, rowToSplit + 1, addIndexY + 1, rectangleToAdd._color);
+		container->grid.FillSections(columnToSplit + 1, coords.x + 1, rowToSplit + 1, coords.y + 1, rectangleToAdd._color);
 		break;
 	}
 }
