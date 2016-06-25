@@ -33,7 +33,7 @@ ReturnCode FitRectangles(MainContainer* container, MainContainer* originalContai
 		return Deadend;
 
 	if (rectangleIndex == 0)
-		remainingGaps = std::vector<Coordinates>{ remainingGaps[0] };
+		remainingGaps = std::vector<Coordinates>{ remainingGaps[0], remainingGaps[4] };
 
 	int nextRectangleIndex = rectangleIndex + 1;
 	
