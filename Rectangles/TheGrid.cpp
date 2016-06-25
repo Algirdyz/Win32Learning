@@ -203,9 +203,8 @@ float TheGrid::GetColumnWidth(int index, int endIndex)
 	return width;
 }
 
-void TheGrid::FillSections(int startX, int endX, int startY, int endY)
+void TheGrid::FillSections(int startX, int endX, int startY, int endY, D2D1::ColorF color)
 {
-	auto color = D2D1::ColorF(RandomFloat(0, 1), RandomFloat(0, 1), RandomFloat(0, 1), 1);
 	for(int i = startY; i <= endY; i++)
 	{
 		for (int j = startX; j <= endX; j++)

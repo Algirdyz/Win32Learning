@@ -93,7 +93,9 @@ float MainContainer::DrawRectangles(ID2D1HwndRenderTarget* m_pRenderTarget, ID2D
 			basicMargins + generatedRectangles[i]._height
 		);
 
-		m_pRenderTarget->DrawRectangle(&rectangle, m_pLightSlateGrayBrush);
+		m_pLightSlateGrayBrush->SetColor(generatedRectangles[i]._color);
+
+		m_pRenderTarget->FillRectangle(&rectangle, m_pLightSlateGrayBrush);
 
 		totalRectangleMargin += basicMargins + generatedRectangles[i]._width;
 		if (highestRecntangleHeigh < generatedRectangles[i]._height)
@@ -107,6 +109,8 @@ float MainContainer::DrawRectangles(ID2D1HwndRenderTarget* m_pRenderTarget, ID2D
 		basicMargins + containerWidth,
 		basicMargins * 2 + highestRecntangleHeigh + containerHeight
 	);
+
+	m_pLightSlateGrayBrush->SetColor(D2D1::ColorF(D2D1::ColorF::CornflowerBlue));
 
 	// Draw a filled rectangle.
 	m_pRenderTarget->FillRectangle(&rectangle1, m_pLightSlateGrayBrush);

@@ -115,16 +115,16 @@ void InsertRectangleIntoGrid(MainContainer* container, int addIndexX, int addInd
 	switch (corner)
 	{
 	case upperLeft:
-		container->grid.FillSections(addIndexX, columnToSplit, addIndexY, rowToSplit);
+		container->grid.FillSections(addIndexX, columnToSplit, addIndexY, rowToSplit, rectangleToAdd._color);
 		break;
 	case upperRight:
-		container->grid.FillSections(columnToSplit + 1, addIndexX + 1, addIndexY, rowToSplit);
+		container->grid.FillSections(columnToSplit + 1, addIndexX + 1, addIndexY, rowToSplit, rectangleToAdd._color);
 		break;
 	case lowerLeft:
-		container->grid.FillSections(addIndexX, columnToSplit, rowToSplit + 1, addIndexY + 1);
+		container->grid.FillSections(addIndexX, columnToSplit, rowToSplit + 1, addIndexY + 1, rectangleToAdd._color);
 		break;
 	case lowerRight:
-		container->grid.FillSections(columnToSplit + 1, addIndexX + 1, rowToSplit + 1, addIndexY + 1);
+		container->grid.FillSections(columnToSplit + 1, addIndexX + 1, rowToSplit + 1, addIndexY + 1, rectangleToAdd._color);
 		break;
 	}
 }

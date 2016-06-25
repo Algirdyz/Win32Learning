@@ -1,4 +1,6 @@
 #pragma once
+#include <d2d1helper.h>
+
 class Rect
 {
 public:
@@ -10,7 +12,9 @@ public:
 	float _height;
 	float _width;
 
-	int rotation = 0;
+	bool _rotated = false;
+
+	D2D1::ColorF _color;
 
 	bool operator>(const Rect&) const;
 	bool operator<(const Rect&) const;

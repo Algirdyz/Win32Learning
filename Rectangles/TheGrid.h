@@ -34,14 +34,12 @@ public:
 	float GetColumnWidth(int index);
 	float GetColumnWidth(int index, int endIndex);
 
-	void FillSections(int startX, int endX, int startY, int endY);
+	void FillSections(int startX, int endX, int startY, int endY, D2D1::ColorF color);
 
 	int GetRowIndexToFitRectangle(int addIndexY, float height, Corners corner, bool* wasRowSplit);
 
 	int GetColumnIndexToFitRectangle(int addIndexX, float width, Corners corner, bool* wasColumnSplit);
 
 	std::vector<Coordinates> FindGaps(float height, float width);
-
-
 };
 

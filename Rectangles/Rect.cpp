@@ -1,8 +1,10 @@
 #include "stdafx.h"
 #include "Rect.h"
+#include "Utils.h"
 
 
-Rect::Rect(float height, float width, int guid)
+Rect::Rect(float height, float width, int guid): 
+	_color(D2D1::ColorF(RandomFloat(0, 1), RandomFloat(0, 1), RandomFloat(0, 1), 1)) 
 {
 	_height = height;
 	_width = width;
