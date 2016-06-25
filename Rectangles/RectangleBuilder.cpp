@@ -24,48 +24,46 @@ ReturnCode FitRectangles(MainContainer* container, MainContainer* originalContai
 		if (container->generatedRectangles.size() < container->addedRectangles.size())
 			throw;
 
-		return NoRectangles;		
+		return Deadend;		
 	}
 	auto rectangle = container->generatedRectangles[rectangleIndex];
 	auto remainingGaps = container->grid.FindGaps(rectangle._height, rectangle._width);
 
 	if (remainingGaps.size() == 0)
-		return NoGaps;
+		return Deadend;
+
+	if (rectangleIndex == 0)
+		remainingGaps = std::vector<Coordinates>{ remainingGaps[0] };
 
 	int nextRectangleIndex = rectangleIndex + 1;
 	
+	auto newContainer = *container;
+
 	for(int j = 0; j < remainingGaps.size(); j++)
 	{
-		auto newContainer = *container;
+		auto loopContainer = newContainer;
 
-		InsertRectangleIntoGrid(&newContainer, remainingGaps[j].x, remainingGaps[j].y, rectangle, remainingGaps[j].corners);
-		newContainer.addedRectangles.push_back(rectangle);
+		InsertRectangleIntoGrid(&loopContainer, remainingGaps[j].x, remainingGaps[j].y, rectangle, remainingGaps[j].corners);
+		loopContainer.addedRectangles.push_back(rectangle);
 
-		*originalContainer = newContainer;
+		*originalContainer = loopContainer;
 
-		Rectangles *pDemoApp = reinterpret_cast<Rectangles *>(static_cast<LONG_PTR>(
-			::GetWindowLongPtrW(
-				hwnd,
-				GWLP_USERDATA
-			)));
-		pDemoApp->OnRender();	
+		//Rectangles *pDemoApp = reinterpret_cast<Rectangles *>(static_cast<LONG_PTR>(::GetWindowLongPtrW(hwnd,GWLP_USERDATA)));
+		//pDemoApp->OnRender();	
 
-		switch (FitRectangles(&newContainer, originalContainer, hwnd, nextRectangleIndex))
-		{
-		case NoRectangles:
-			return NoRectangles;
-		case NoGaps:
+		//Sleep(10);
+
+		switch (FitRectangles(&loopContainer, originalContainer, hwnd, nextRectangleIndex))
+		{		
+		case Success:
+			*container = loopContainer;
+			return Success;
+		case Deadend:
 
 			break;
-		case Success:
-			*container = newContainer;
-			return Success;
-		case Finished:
-			return Finished;
 		}
 	}
-
-	return Finished;
+	return Deadend;
 }
 
 ReturnCode SolveRectangles(MainContainer* container, HWND hwnd)
