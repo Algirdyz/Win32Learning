@@ -14,11 +14,14 @@ class MainContainer
 public:
 	MainContainer(int mainHeight, int mainWidth, int amountToGenerate);
 	~MainContainer();
+
 	float containerHeight;
 	float containerWidth;
 	float basicMargins = 10;
 
 	std::vector<Rect> generatedRectangles;
+	std::vector<Rect> addedRectangles;
+
 	TheGrid grid;
 
 	Rect GenerateRandomRectangle(int guid);
@@ -29,5 +32,6 @@ public:
 	float DrawRectangles(ID2D1HwndRenderTarget* renderTarget, ID2D1SolidColorBrush* solidBrush);
 	void DrawSolvedRectangles(ID2D1HwndRenderTarget* m_pRenderTarget, ID2D1SolidColorBrush* m_pLightSlateGrayBrush, float topMargin, float leftMargin);
 	void DrawFilledSections(ID2D1HwndRenderTarget* m_pRenderTarget, ID2D1SolidColorBrush* m_pLightSlateGrayBrush, float topMargin, float leftMargin);
+	void ClearContainer();
 };
 

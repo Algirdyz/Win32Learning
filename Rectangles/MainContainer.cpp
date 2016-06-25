@@ -33,8 +33,8 @@ MainContainer::~MainContainer()
 
 Rect MainContainer::GenerateRandomRectangle(int guid)
 {
-	float h = RandomFloat(5, containerHeight / 2);
-	float w = RandomFloat(5, containerWidth / 2);
+	float h = RandomFloat(5, containerHeight/2);
+	float w = RandomFloat(5, containerWidth/2);
 
 	return Rect(h, w, guid);
 }
@@ -171,4 +171,10 @@ void MainContainer::DrawFilledSections(ID2D1HwndRenderTarget* m_pRenderTarget, I
 		}
 		rowCoordinatesY += row[0].sizeY;
 	}
+}
+
+void MainContainer::ClearContainer()
+{
+	addedRectangles.clear();
+	grid = TheGrid(containerHeight, containerWidth);
 }

@@ -13,22 +13,66 @@ RectangleBuilder::~RectangleBuilder()
 {
 }
 
-void FitRectangles(MainContainer* container, HWND hwnd)
+// Recursive method loops through different rectangle configurations until it finds the correct one
+ReturnCode FitRectangles(MainContainer* container, MainContainer* originalContainer, HWND hwnd, int rectangleIndex)
 {
-	for (Rect rectangle : container->generatedRectangles)
+	if (container->generatedRectangles.size() <= rectangleIndex)
 	{
-		auto gaps = container->grid.FindGaps(rectangle._height, rectangle._width);
-		
-		if(gaps.size() > 0)
-			InsertRectangleIntoGrid(container, gaps[0].x, gaps[0].y, rectangle, gaps[0].corners);
-		
+		if (container->generatedRectangles.size() == container->addedRectangles.size())
+			return Success;
+
+		if (container->generatedRectangles.size() < container->addedRectangles.size())
+			throw;
+
+		return NoRectangles;		
+	}
+	auto rectangle = container->generatedRectangles[rectangleIndex];
+	auto remainingGaps = container->grid.FindGaps(rectangle._height, rectangle._width);
+
+	if (remainingGaps.size() == 0)
+		return NoGaps;
+
+	int nextRectangleIndex = rectangleIndex + 1;
+	
+	for(int j = 0; j < remainingGaps.size(); j++)
+	{
+		auto newContainer = *container;
+
+		InsertRectangleIntoGrid(&newContainer, remainingGaps[j].x, remainingGaps[j].y, rectangle, remainingGaps[j].corners);
+		newContainer.addedRectangles.push_back(rectangle);
+
+		*originalContainer = newContainer;
+
 		Rectangles *pDemoApp = reinterpret_cast<Rectangles *>(static_cast<LONG_PTR>(
 			::GetWindowLongPtrW(
 				hwnd,
 				GWLP_USERDATA
 			)));
-		pDemoApp->OnRender();
+		pDemoApp->OnRender();	
+
+		switch (FitRectangles(&newContainer, originalContainer, hwnd, nextRectangleIndex))
+		{
+		case NoRectangles:
+			return NoRectangles;
+		case NoGaps:
+
+			break;
+		case Success:
+			*container = newContainer;
+			return Success;
+		case Finished:
+			return Finished;
+		}
 	}
+
+	return Finished;
+}
+
+ReturnCode SolveRectangles(MainContainer* container, HWND hwnd)
+{
+	auto result = FitRectangles(container, container, hwnd);
+
+	return result;
 }
 
 void InsertRectangleIntoGrid(MainContainer* container, int addIndexX, int addIndexY, Rect rectangleToAdd, Corners corner)

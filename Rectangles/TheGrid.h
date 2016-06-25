@@ -1,7 +1,6 @@
 #pragma once
 #include "ContainerSection.h"
 #include <vector>
-#include "Rect.h"
 #include "Coordinates.h"
 
 class TheGrid

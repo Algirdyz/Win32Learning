@@ -66,6 +66,9 @@
     <ClInclude Include="Corners.h">
       <Filter>Header Files\Enums</Filter>
     </ClInclude>
+    <ClInclude Include="ReturnCodeEnum.h">
+      <Filter>Header Files\Enums</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
